@@ -269,11 +269,11 @@ function SidebarTrigger({
         onClick?.(event)
         toggleSidebar()
       }}
-      size="icon-sm"
+      size="icon"
       variant="ghost"
       {...props}
     >
-      <IconLayoutSidebar />
+      <IconLayoutSidebar className="size-5" />
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   )
