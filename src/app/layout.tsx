@@ -1,13 +1,15 @@
 import type { Metadata } from "next"
 import { Geist, Geist_Mono, Noto_Sans } from "next/font/google"
 
+import { AppSidebar } from "@/components/layout/app-sidebar"
 import { ThemeProvider } from "@/components/theme-provider"
-import { SidebarProvider } from "@/components/ui/sidebar"
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { TRPCReactProvider } from "@/lib/api/client"
 import { cn } from "@/lib/utils"
 
 import "@/styles/globals.css"
+import { api, HydrateClient } from "@/lib/api/server"
 
 const notoSans = Noto_Sans({
   subsets: ["latin"],
@@ -34,6 +36,9 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  void api.system.health.prefetch()
+  void api.system.version.prefetch()
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body
@@ -58,7 +63,12 @@ export default function RootLayout({
             enableSystem
           >
             <TooltipProvider>
-              <SidebarProvider>{children}</SidebarProvider>
+              <SidebarProvider>
+                <HydrateClient>
+                  <AppSidebar />
+                </HydrateClient>
+                <SidebarInset>{children}</SidebarInset>
+              </SidebarProvider>
             </TooltipProvider>
           </ThemeProvider>
         </TRPCReactProvider>
