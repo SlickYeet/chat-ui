@@ -1,6 +1,7 @@
 "use client"
 
 import { IconBox, IconDownload, IconReload } from "@tabler/icons-react"
+import { useRouter } from "next/navigation"
 import * as React from "react"
 import { toast } from "sonner"
 
@@ -35,6 +36,7 @@ export function ModelList() {
   )
 
   const { setSelectedModel: setChatModel, createConversation } = useChatStore()
+  const router = useRouter()
 
   const [{ models }, { isLoading, refetch, isRefetching }] =
     api.models.list.useSuspenseQuery()
@@ -58,7 +60,8 @@ export function ModelList() {
   function handleSelectModel(model: OllamaModel) {
     setChatModel(model.name)
     createConversation(model.name)
-    // TODO: Navigate to chat - this would be handled by parent in a real app
+    // Navigate to chat
+    router.push("/")
   }
 
   function handleDeleteModel() {
