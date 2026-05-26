@@ -41,19 +41,14 @@ export function ChatPanel() {
     generation.status === "waiting" ||
     generation.status === "loading"
 
-  React.useEffect(
-    () => {
-      if (bottomRef.current) {
-        bottomRef.current.scrollIntoView({
-          behavior: "smooth",
-        })
-      }
-    },
-    [
-      // TODO: figure out if we can remove these deps or keep them
-      // messages.length, generation.tokenCount
-    ],
-  )
+  // biome-ignore lint/correctness/useExhaustiveDependencies: We only want to scroll on new messages or generation token count changes, not on every generation status change
+  React.useEffect(() => {
+    if (bottomRef.current) {
+      bottomRef.current.scrollIntoView({
+        behavior: "smooth",
+      })
+    }
+  }, [messages.length, generation.tokenCount])
 
   // Check scroll position to show/hide scroll button
   const handleScroll = React.useCallback((e: React.UIEvent<HTMLDivElement>) => {
