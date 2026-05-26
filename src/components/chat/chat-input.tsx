@@ -52,17 +52,6 @@ export function ChatInput({
     setSelectedModel(models[0].name)
   }, [isMounted, models, selectedModel, setSelectedModel])
 
-  // Auto-resize textarea
-  // TODO: replace with react-textarea-autosize
-  // biome-ignore lint/correctness/useExhaustiveDependencies: we only want to run this when input changes, not when textareaRef changes
-  React.useEffect(() => {
-    const textarea = textareaRef.current
-    if (textarea) {
-      textarea.style.height = "auto"
-      textarea.style.height = `${Math.min(textarea.scrollHeight, 200)}px`
-    }
-  }, [input])
-
   const handleSubmit = React.useCallback(() => {
     if (!input.trim() || isGenerating || !selectedModel) return
     onSend(input.trim())
