@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { TRPCReactProvider } from "@/lib/api/client"
+import { ChatStoreHydrator } from "@/lib/store/chat-store-hydrator"
 import { cn } from "@/lib/utils"
 
 import "@/styles/globals.css"
@@ -64,6 +65,7 @@ export default function RootLayout({
           >
             <TooltipProvider>
               <SidebarProvider>
+                <ChatStoreHydrator />
                 <HydrateClient>
                   <AppSidebar />
                 </HydrateClient>

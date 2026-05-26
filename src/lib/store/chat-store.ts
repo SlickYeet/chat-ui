@@ -334,6 +334,7 @@ export const useChatStore = create<ChatState>()(
         conversations: state.conversations,
         selectedModel: state.selectedModel,
       }),
+      skipHydration: true,
       storage: createJSONStorage(() => localStorage),
     },
   ),

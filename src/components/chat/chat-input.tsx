@@ -33,17 +33,24 @@ export function ChatInput({
   const textareaRef = React.useRef<HTMLTextAreaElement>(null)
 
   const [input, setInput] = React.useState("")
+  const [isMounted, setIsMounted] = React.useState(false)
 
   const { selectedModel, setSelectedModel } = useChatStore()
 
   const [{ models }, { isLoading }] = api.models.list.useSuspenseQuery()
 
+  React.useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
   // Auto-select first model if none selected
   React.useEffect(() => {
-    if (!selectedModel && models.length > 0) {
-      setSelectedModel(models[0].name)
+    if (!isMounted || selectedModel || models.length === 0) {
+      return
     }
-  }, [models, selectedModel, setSelectedModel])
+
+    setSelectedModel(models[0].name)
+  }, [isMounted, models, selectedModel, setSelectedModel])
 
   // Auto-resize textarea
   // TODO: replace with react-textarea-autosize
