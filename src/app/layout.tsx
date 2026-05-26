@@ -1,10 +1,13 @@
 import type { Metadata } from "next"
 import { Geist, Geist_Mono, Noto_Sans } from "next/font/google"
 
+import { ThemeProvider } from "@/components/theme-provider"
+import { SidebarProvider } from "@/components/ui/sidebar"
+import { TooltipProvider } from "@/components/ui/tooltip"
 import { TRPCReactProvider } from "@/lib/api/client"
+import { cn } from "@/lib/utils"
 
 import "@/styles/globals.css"
-import { cn } from "@/lib/utils"
 
 const notoSans = Noto_Sans({
   subsets: ["latin"],
@@ -32,11 +35,33 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html className={cn("font-sans", notoSans.variable)} lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={cn(
+          "anitialiased font-sans",
+          geistSans.variable,
+          geistMono.variable,
+          notoSans.variable,
+        )}
+        style={
+          {
+            "--header-height": "calc(var(--spacing) * 16)",
+            "--sidebar-width": "calc(var(--spacing) * 74)",
+          } as React.CSSProperties
+        }
       >
-        <TRPCReactProvider>{children}</TRPCReactProvider>
+        <TRPCReactProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            disableTransitionOnChange
+            enableSystem
+          >
+            <TooltipProvider>
+              <SidebarProvider>{children}</SidebarProvider>
+            </TooltipProvider>
+          </ThemeProvider>
+        </TRPCReactProvider>
       </body>
     </html>
   )
