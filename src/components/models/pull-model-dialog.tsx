@@ -33,12 +33,16 @@ export function PullModelDialog({ open, onOpenChange }: PullModelDialogProps) {
   const utils = api.useUtils()
 
   const [modelName, setModelName] = React.useState("")
+  const [submittedModel, setSubmittedModel] = React.useState<string | null>(
+    null,
+  )
   const [error, setError] = React.useState<string | null>(null)
   const [pullState, setPullState] = React.useState<PullState>("idle")
   const [progress, setProgress] = React.useState<PullProgress | null>(null)
 
   const resetState = React.useCallback(() => {
     setModelName("")
+    setSubmittedModel(null)
     setPullState("idle")
     setProgress(null)
     setError(null)
@@ -51,102 +55,40 @@ export function PullModelDialog({ open, onOpenChange }: PullModelDialogProps) {
     }
   }, [pullState, onOpenChange, resetState])
 
-  const handlePull = React.useCallback(async () => {
-    if (!modelName.trim()) return
+  const handlePull = React.useCallback(() => {
+    const model = modelName.trim()
+    if (!model) return
 
     setPullState("pulling")
     setProgress(null)
     setError(null)
+    setSubmittedModel(model)
+  }, [modelName])
 
-    try {
-      const response = await fetch("/api/trpc", {
-        body: JSON.stringify({
-          0: {
-            jsonrpc: "2.0",
-            method: "subscription",
-            params: {
-              input: { model: modelName.trim() },
-              path: "models.pull",
-            },
-          },
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-        method: "POST",
-      })
+  api.models.pull.useSubscription(
+    {
+      model: submittedModel ?? "",
+    },
+    {
+      enabled: pullState === "pulling" && submittedModel !== null,
+      onData(data) {
+        setProgress(data)
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
-      if (!response.body) {
-        throw new Error("Response body is empty")
-      }
-
-      const reader = response.body.getReader()
-      const decoder = new TextDecoder()
-      let buffer = ""
-
-      while (true) {
-        const { done, value } = await reader.read()
-
-        if (done) {
-          if (buffer.trim()) {
-            try {
-              const parsed = JSON.parse(buffer)
-              if (parsed.result?.data) {
-                const data = parsed.result.data as PullProgress
-                if (data.status === "success") {
-                  setPullState("complete")
-                  utils.models.list.invalidate()
-                  toast.success(`Successfully pulled ${modelName}`)
-                }
-              }
-            } catch {
-              // Silently ignore parse errors
-            }
-          }
-          break
+        if (data.status.startsWith("Error:")) {
+          setPullState("error")
+          setError(data.status)
+        } else if (data.status === "success") {
+          setPullState("complete")
+          void utils.models.list.invalidate()
+          toast.success(`Successfully pulled ${submittedModel}`)
         }
-
-        buffer += decoder.decode(value, { stream: true })
-        const lines = buffer.split("\n")
-
-        // Process all complete lines
-        for (let i = 0; i < lines.length - 1; i++) {
-          const line = lines[i].trim()
-          if (line) {
-            try {
-              const parsed = JSON.parse(line)
-              if (parsed.result?.data) {
-                const data = parsed.result.data as PullProgress
-                setProgress(data)
-
-                if (data.status.startsWith("Error:")) {
-                  setPullState("error")
-                  setError(data.status)
-                } else if (data.status === "success") {
-                  setPullState("complete")
-                  utils.models.list.invalidate()
-                  toast.success(`Successfully pulled ${modelName}`)
-                }
-              }
-            } catch {
-              // Silently ignore parse errors
-            }
-          }
-        }
-
-        buffer = lines[lines.length - 1]
-      }
-    } catch (err) {
-      setPullState("error")
-      const errorMsg =
-        err instanceof Error ? err.message : "Failed to start pull"
-      setError(errorMsg)
-    }
-  }, [modelName, utils.models.list])
+      },
+      onError(err) {
+        setPullState("error")
+        setError(err.message)
+      },
+    },
+  )
 
   const suggestedModels = [
     { desc: "Latest Llama 3.2", name: "llama3.2" },
