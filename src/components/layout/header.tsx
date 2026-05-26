@@ -40,12 +40,20 @@ export function Header({ title }: HeaderProps) {
           </Badge>
         )}
 
-        <div className="flex items-center gap-1.5 text-xs">
+        <div className="relative flex items-center gap-1.5 text-xs">
           <IconCircle
             className={cn(
-              "size-2",
+              "absolute size-2",
               isConnected
-                ? "fill-success text-success"
+                ? "fill-green-500 text-green-500"
+                : "fill-destructive text-destructive",
+            )}
+          />
+          <IconCircle
+            className={cn(
+              "size-2 animate-ping",
+              isConnected
+                ? "fill-green-500 text-green-500"
                 : "fill-destructive text-destructive",
             )}
           />
