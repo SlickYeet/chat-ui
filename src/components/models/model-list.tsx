@@ -1,6 +1,6 @@
 "use client"
 
-import { IconBox, IconDownload, IconRefresh } from "@tabler/icons-react"
+import { IconBox, IconDownload, IconReload } from "@tabler/icons-react"
 import * as React from "react"
 import { toast } from "sonner"
 
@@ -86,7 +86,7 @@ export function ModelList() {
             size="sm"
             variant="outline"
           >
-            <IconRefresh className={cn(isRefetching ? "animate-spin" : "")} />
+            <IconReload className={cn(isRefetching ? "animate-spin" : "")} />
             Refresh
           </Button>
           <Button
