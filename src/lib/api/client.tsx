@@ -2,10 +2,15 @@
 
 import type { QueryClient } from "@tanstack/react-query"
 import { QueryClientProvider } from "@tanstack/react-query"
-import { httpBatchStreamLink, loggerLink } from "@trpc/client"
+import {
+  httpBatchStreamLink,
+  httpSubscriptionLink,
+  loggerLink,
+  splitLink,
+} from "@trpc/client"
 import { createTRPCReact } from "@trpc/react-query"
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server"
-import React from "react"
+import type React from "react"
 import superjson from "superjson"
 
 import { getBaseUrl } from "@/lib/utils"
@@ -27,6 +32,34 @@ function getQueryClient() {
 
 export const api = createTRPCReact<AppRouter>()
 
+const trpcLinks = [
+  loggerLink({
+    enabled: (opts) =>
+      process.env.NODE_ENV === "development" ||
+      (opts.direction === "down" && opts.result instanceof Error),
+  }),
+  splitLink({
+    condition: (op) => op.type === "subscription",
+    false: httpBatchStreamLink({
+      headers() {
+        const headers = new Headers()
+        headers.set("x-trpc-source", "nextjs-react")
+        return headers
+      },
+      transformer: superjson,
+      url: `${getBaseUrl()}/api/trpc`,
+    }),
+    true: httpSubscriptionLink({
+      transformer: superjson,
+      url: `${getBaseUrl()}/api/trpc`,
+    }),
+  }),
+]
+
+export const trpcClient = api.createClient({
+  links: trpcLinks,
+})
+
 /**
  * Inference helper for inputs.
  *
@@ -43,38 +76,6 @@ export type RouterOutputs = inferRouterOutputs<AppRouter>
 
 export function TRPCReactProvider({ children }: React.PropsWithChildren) {
   const queryClient = getQueryClient()
-
-  const [trpcClient] = React.useState(() =>
-    api.createClient({
-      links: [
-        /**
-         * The loggerLink is useful for debugging, but can be very noisy.
-         * You can disable Query logging by commenting out the process.env.NODE_ENV check.
-         *
-         * @example
-         * loggerLink({
-         *   enabled: (opts) =>
-         *     // process.env.NODE_ENV === "development" ||
-         *     opts.direction === "down" && opts.result instanceof Error,
-         * }),
-         */
-        loggerLink({
-          enabled: (opts) =>
-            process.env.NODE_ENV === "development" ||
-            (opts.direction === "down" && opts.result instanceof Error),
-        }),
-        httpBatchStreamLink({
-          headers() {
-            const headers = new Headers()
-            headers.set("x-trpc-source", "nextjs-react")
-            return headers
-          },
-          transformer: superjson,
-          url: `${getBaseUrl()}/api/trpc`,
-        }),
-      ],
-    }),
-  )
 
   return (
     <QueryClientProvider client={queryClient}>

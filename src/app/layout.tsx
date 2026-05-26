@@ -10,6 +10,8 @@ import { ChatStoreHydrator } from "@/lib/store/chat-store-hydrator"
 import { cn } from "@/lib/utils"
 
 import "@/styles/globals.css"
+
+import { Toaster } from "@/components/ui/sonner"
 import { api, HydrateClient } from "@/lib/api/server"
 
 const notoSans = Noto_Sans({
@@ -70,6 +72,7 @@ export default function RootLayout({
                   <AppSidebar />
                 </HydrateClient>
                 <SidebarInset>{children}</SidebarInset>
+                <Toaster richColors />
               </SidebarProvider>
             </TooltipProvider>
           </ThemeProvider>

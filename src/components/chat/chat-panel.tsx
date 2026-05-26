@@ -8,8 +8,8 @@ import { ChatMessage } from "@/components/chat/chat-message"
 import { GenerationStats } from "@/components/chat/generation-stats"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { trpcClient } from "@/lib/api/client"
 import { useChatStore } from "@/lib/store/chat-store"
-import type { StreamChunk } from "@/server/api/routers/chat"
 
 export function ChatPanel() {
   const bottomRef = React.useRef<HTMLDivElement>(null)
@@ -98,7 +98,6 @@ export function ChatPanel() {
       setAbortController(controller)
 
       try {
-        // Build messages array for the API
         const conversation = useChatStore
           .getState()
           .conversations.find((c) => c.id === conversationId)
@@ -106,126 +105,53 @@ export function ChatPanel() {
           .filter((m) => m.id !== assistantMsgId)
           .map((m) => ({ content: m.content, role: m.role }))
 
-        // Start streaming via fetch with newline-delimited JSON
-        const startStream = async () => {
-          try {
-            const response = await fetch("/api/trpc", {
-              body: JSON.stringify({
-                0: {
-                  jsonrpc: "2.0",
-                  method: "subscription",
-                  params: {
-                    input: { messages: apiMessages, model: selectedModel },
-                    path: "chat.streamChat",
-                  },
-                },
-              }),
-              headers: {
-                "Content-Type": "application/json",
-              },
-              method: "POST",
-              signal: controller.signal,
-            })
-
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`)
-            }
-
-            if (!response.body) {
-              throw new Error("Response body is empty")
-            }
-
-            const reader = response.body.getReader()
-            const decoder = new TextDecoder()
-            let buffer = ""
-
-            while (true) {
-              const { done, value } = await reader.read()
-
-              if (done) {
-                if (buffer.trim()) {
-                  try {
-                    const parsed = JSON.parse(buffer)
-                    if (parsed.result?.data) {
-                      const data = parsed.result.data as StreamChunk
-                      if (data.type === "complete") {
-                        updateMessage(conversationId, assistantMsgId, {
-                          isStreaming: false,
-                          stats: data.stats,
-                        })
-                        setGenerationStatus("complete")
-                        setTimeout(resetGeneration, 2000)
-                      }
-                    }
-                  } catch {
-                    // Silently ignore parse errors on final buffer
-                  }
-                }
-                break
+        trpcClient.chat.streamChat.subscribe(
+          { messages: apiMessages, model: selectedModel },
+          {
+            onComplete: () => {
+              updateMessage(conversationId, assistantMsgId, {
+                isStreaming: false,
+              })
+              setGenerationStatus("complete")
+              setTimeout(resetGeneration, 2000)
+              setAbortController(null)
+            },
+            onData: (data) => {
+              if (data.type === "token") {
+                setGenerationStatus("generating")
+                appendToMessage(conversationId, assistantMsgId, data.content)
+                incrementTokenCount()
+              } else if (data.type === "complete") {
+                updateMessage(conversationId, assistantMsgId, {
+                  isStreaming: false,
+                  stats: data.stats,
+                })
+                setGenerationStatus("complete")
+                setTimeout(resetGeneration, 2000)
+              } else if (data.type === "error") {
+                updateMessage(conversationId, assistantMsgId, {
+                  error: data.error,
+                  isStreaming: false,
+                })
+                setGenerationStatus("error", data.error)
               }
-
-              buffer += decoder.decode(value, { stream: true })
-              const lines = buffer.split("\n")
-
-              // Process all complete lines
-              for (let i = 0; i < lines.length - 1; i++) {
-                const line = lines[i].trim()
-                if (line) {
-                  try {
-                    const parsed = JSON.parse(line)
-                    if (parsed.result?.data) {
-                      const data = parsed.result.data as StreamChunk
-
-                      if (data.type === "token") {
-                        setGenerationStatus("generating")
-                        appendToMessage(
-                          conversationId,
-                          assistantMsgId,
-                          data.content,
-                        )
-                        incrementTokenCount()
-                      } else if (data.type === "complete") {
-                        updateMessage(conversationId, assistantMsgId, {
-                          isStreaming: false,
-                          stats: data.stats,
-                        })
-                        setGenerationStatus("complete")
-                        setTimeout(resetGeneration, 2000)
-                      } else if (data.type === "error") {
-                        updateMessage(conversationId, assistantMsgId, {
-                          error: data.error,
-                          isStreaming: false,
-                        })
-                        setGenerationStatus("error", data.error)
-                      }
-                    }
-                  } catch {
-                    // Silently ignore parse errors
-                  }
-                }
-              }
-
-              buffer = lines[lines.length - 1]
-            }
-
-            setAbortController(null)
-          } catch (error) {
-            if (error instanceof Error && error.name === "AbortError") {
-              // User cancelled - this is expected
-              return
-            }
-            const errorMsg =
-              error instanceof Error ? error.message : "Unknown error"
-            updateMessage(conversationId, assistantMsgId, {
-              error: errorMsg,
-              isStreaming: false,
-            })
-            setGenerationStatus("error", errorMsg)
-            setAbortController(null)
-          }
-        }
-
-        startStream()
+            },
+            onError: (error) => {
+              const errorMsg =
+                error instanceof Error ? error.message : "Unknown error"
+              updateMessage(conversationId, assistantMsgId, {
+                error: errorMsg,
+                isStreaming: false,
+              })
+              setGenerationStatus("error", errorMsg)
+              setAbortController(null)
+            },
+            onStopped: () => {
+              setAbortController(null)
+            },
+            signal: controller.signal,
+          },
+        )
       } catch (error) {
         const errorMessage =
           error instanceof Error ? error.message : "Unknown error"
