@@ -176,6 +176,94 @@ export function ChatPanel() {
     ],
   )
 
+  async function handleRetry(messageId: string) {
+    if (!selectedModel) return
+
+    const conversationId =
+      activeConversationId ?? useChatStore.getState().activeConversationId
+    if (!conversationId) return
+
+    // Reset the failed assistant message to streaming state
+    updateMessage(conversationId, messageId, {
+      content: "",
+      error: undefined,
+      isStreaming: true,
+      stats: undefined,
+    })
+
+    setGenerationStatus("waiting")
+
+    const controller = new AbortController()
+    setAbortController(controller)
+
+    try {
+      const conversation = useChatStore
+        .getState()
+        .conversations.find((c) => c.id === conversationId)
+
+      const apiMessages = (conversation?.messages ?? [])
+        .filter((m) => m.id !== messageId)
+        .map((m) => ({ content: m.content, role: m.role }))
+
+      trpcClient.chat.streamChat.subscribe(
+        { messages: apiMessages, model: selectedModel },
+        {
+          onComplete: () => {
+            updateMessage(conversationId, messageId, {
+              isStreaming: false,
+            })
+            setGenerationStatus("complete")
+            setTimeout(resetGeneration, 2000)
+            setAbortController(null)
+          },
+          onData: (data) => {
+            if (data.type === "token") {
+              setGenerationStatus("generating")
+              appendToMessage(conversationId, messageId, data.content)
+              incrementTokenCount()
+            } else if (data.type === "complete") {
+              updateMessage(conversationId, messageId, {
+                isStreaming: false,
+                stats: data.stats,
+              })
+              setGenerationStatus("complete")
+              setTimeout(resetGeneration, 2000)
+            } else if (data.type === "error") {
+              updateMessage(conversationId, messageId, {
+                error: data.error,
+                isStreaming: false,
+              })
+              setGenerationStatus("error", data.error)
+            }
+          },
+          onError: (error) => {
+            const errorMsg =
+              error instanceof Error ? error.message : "Unknown error"
+            updateMessage(conversationId, messageId, {
+              error: errorMsg,
+              isStreaming: false,
+            })
+            setGenerationStatus("error", errorMsg)
+            setAbortController(null)
+          },
+          onStopped: () => {
+            setAbortController(null)
+          },
+          signal: controller.signal,
+        },
+      )
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error"
+      updateMessage(conversationId, messageId, {
+        error: errorMessage,
+        isStreaming: false,
+      })
+      setGenerationStatus("error", errorMessage)
+      setAbortController(null)
+    }
+  }
+
   const handleStop = React.useCallback(() => {
     if (abortController) {
       abortController.abort()
@@ -229,7 +317,7 @@ export function ChatPanel() {
                     onRetry={
                       message.error
                         ? () => {
-                            // TODO: Implement retry logic
+                            void handleRetry(message.id)
                           }
                         : undefined
                     }
