@@ -291,11 +291,11 @@ export function ChatPanel() {
           <div className="min-h-full">
             {messages.length === 0 ? (
               <div className="flex h-full min-h-100 flex-col items-center justify-center gap-4 p-8 text-center">
-                <div className="rounded-full bg-secondary p-4">
-                  <IconMessagePlus className="size-8 text-muted-foreground" />
+                <div className="rounded-2xl bg-secondary/10 p-6 shadow-md">
+                  <IconMessagePlus className="size-8 text-secondary-foreground" />
                 </div>
                 <div>
-                  <h2 className="font-semibold text-xl">
+                  <h2 className="font-semibold text-2xl">
                     Start a conversation
                   </h2>
                   <p className="mt-1 text-muted-foreground text-sm">
@@ -326,7 +326,7 @@ export function ChatPanel() {
 
         {showScrollButton && (
           <Button
-            className="absolute right-4 bottom-4 rounded-full shadow-lg"
+            className="absolute right-4 bottom-4 rounded-full shadow-xl"
             onClick={scrollToBottom}
             size="icon"
             variant="secondary"

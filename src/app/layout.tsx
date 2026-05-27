@@ -12,7 +12,6 @@ import { cn } from "@/lib/utils"
 import "@/styles/globals.css"
 
 import { Toaster } from "@/components/ui/sonner"
-import { api, HydrateClient } from "@/lib/api/server"
 
 const notoSans = Noto_Sans({
   subsets: ["latin"],
@@ -34,14 +33,13 @@ export const metadata: Metadata = {
   title: "Create Lx2 App",
 }
 
+export const dynamic = "force-dynamic"
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  void api.system.health.prefetch()
-  void api.system.version.prefetch()
-
   return (
     <html lang="en" suppressHydrationWarning>
       <body
@@ -68,9 +66,7 @@ export default function RootLayout({
             <TooltipProvider>
               <SidebarProvider>
                 <ChatStoreHydrator />
-                <HydrateClient>
-                  <AppSidebar />
-                </HydrateClient>
+                <AppSidebar />
                 <SidebarInset>{children}</SidebarInset>
                 <Toaster richColors />
               </SidebarProvider>

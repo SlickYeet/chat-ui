@@ -14,6 +14,7 @@ export const env = createEnv({
     NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_URL,
     NODE_ENV: process.env.NODE_ENV,
     OLLAMA_URL: process.env.OLLAMA_URL,
+    REDIS_URL: process.env.REDIS_URL,
   },
   server: {
     BETTER_AUTH_SECRET: z.string(),
@@ -24,6 +25,7 @@ export const env = createEnv({
       .enum(["development", "test", "production"])
       .default("development"),
     OLLAMA_URL: z.url(),
+    REDIS_URL: z.string(),
   },
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
 })

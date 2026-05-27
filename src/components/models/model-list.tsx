@@ -37,11 +37,27 @@ export function ModelList() {
 
   const { setSelectedModel: setChatModel, createConversation } = useChatStore()
   const router = useRouter()
+  const [isMounted, setIsMounted] = React.useState(false)
 
-  const [{ models }, { isLoading, refetch, isRefetching }] =
-    api.models.list.useSuspenseQuery()
+  React.useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
-  const [{ models: runningModels }] = api.models.running.useSuspenseQuery()
+  const {
+    data: modelsData,
+    isLoading,
+    refetch,
+    isRefetching,
+  } = api.models.list.useQuery(undefined, {
+    enabled: isMounted,
+  })
+
+  const { data: runningModelsData } = api.models.running.useQuery(undefined, {
+    enabled: isMounted,
+  })
+
+  const models = modelsData?.models ?? []
+  const runningModels = runningModelsData?.models ?? []
 
   const deleteModel = api.models.delete.useMutation({
     onError(error) {

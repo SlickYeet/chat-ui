@@ -111,3 +111,47 @@ export const verification = createTable(
   }),
   (t) => [index("verification_identifier_idx").on(t.identifier)],
 )
+
+export const conversation = createTable("conversation", (d) => ({
+  createdAt: d
+    .timestamp({ withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  id: d.text().primaryKey(),
+  model: d.text().notNull(),
+  title: d.varchar({ length: 255 }).notNull(),
+  updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
+  userId: d
+    .text()
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+}))
+
+export const message = createTable("message", (d) => ({
+  content: d.text().notNull(),
+  conversationId: d
+    .text()
+    .notNull()
+    .references(() => conversation.id, { onDelete: "cascade" }),
+  createdAt: d
+    .timestamp({ withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  error: d.text(),
+  id: d.text().primaryKey(),
+  pinned: d.boolean().$defaultFn(() => false),
+  reactions: d.json(),
+  role: d.text().notNull(),
+  updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
+}))
+
+export const model = createTable("model", (d) => ({
+  createdAt: d
+    .timestamp({ withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  description: d.text(),
+  id: d.text().primaryKey(),
+  name: d.text().notNull(),
+  updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
+}))

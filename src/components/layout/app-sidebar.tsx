@@ -8,6 +8,7 @@ import {
   IconWifiOff,
 } from "@tabler/icons-react"
 import { usePathname, useRouter } from "next/navigation"
+import * as React from "react"
 
 import { ChatSidebar } from "@/components/chat/chat-sidebar"
 import { Badge } from "@/components/ui/badge"
@@ -49,11 +50,20 @@ const navItems = [
 export function AppSidebar() {
   const router = useRouter()
   const pathname = usePathname()
+  const [isMounted, setIsMounted] = React.useState(false)
 
-  const [systemHealth] = api.system.health.useSuspenseQuery()
-  const [systemVersion] = api.system.version.useSuspenseQuery()
+  React.useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
-  const isConnected = systemHealth.status === "connected"
+  const { data: systemHealth } = api.system.health.useQuery(undefined, {
+    enabled: isMounted,
+  })
+  const { data: systemVersion } = api.system.version.useQuery(undefined, {
+    enabled: isMounted,
+  })
+
+  const isConnected = systemHealth?.status === "connected"
 
   return (
     <Sidebar>
@@ -120,7 +130,7 @@ export function AppSidebar() {
               </div>
             </TooltipTrigger>
             <TooltipContent side="top">
-              <p>{systemHealth.url || "http://localhost:11434"}</p>
+              <p>{systemHealth?.url ?? "Unavailable"}</p>
             </TooltipContent>
           </Tooltip>
 

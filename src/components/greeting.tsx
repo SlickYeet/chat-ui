@@ -1,11 +1,7 @@
 "use client"
 
-import { api } from "@/lib/api/client"
-
 export function Greeting() {
-  const [greeting] = api.post.greeting.useSuspenseQuery({
-    text: "from tRPC!",
-  })
+  const greeting = "Hello from Chat UI"
 
   return (
     <div className="mt-12 flex flex-col items-center gap-3">

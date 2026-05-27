@@ -73,7 +73,7 @@
   --chart-3: oklch(0.577 0.245 27.325);
   --chart-4: oklch(0.505 0.213 27.518);
   --chart-5: oklch(0.444 0.177 26.899);
-  --radius: 0.45rem;
+  --radius: 0.6rem;
   --sidebar: oklch(0.987 0.002 197.1);
   --sidebar-foreground: oklch(0.148 0.004 228.8);
   --sidebar-primary: oklch(0.596 0.145 163.225);
@@ -123,7 +123,10 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    font-variant-ligatures: common-ligatures;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    @apply bg-background text-foreground antialiased;
   }
   button:not(:disabled),
   [role="button"]:not(:disabled) {
@@ -131,5 +134,9 @@
   }
   html {
     @apply font-sans;
+  }
+
+  .app-container {
+    @apply mx-auto max-w-6xl px-4 sm:px-6 lg:px-8;
   }
 }

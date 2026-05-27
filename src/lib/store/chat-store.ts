@@ -1,6 +1,8 @@
 import { create } from "zustand"
 import { createJSONStorage, persist } from "zustand/middleware"
 
+import { trpcClient } from "@/lib/api/client"
+
 export interface Message {
   id: string
   role: "system" | "user" | "assistant"
@@ -17,6 +19,8 @@ export interface Message {
     evalDuration: number
     tokensPerSecond: number
   }
+  pinned?: boolean
+  reactions?: Record<string, number>
 }
 
 export interface Conversation {
@@ -70,6 +74,12 @@ interface ChatState {
     content: string,
   ) => void
   deleteMessage: (conversationId: string, messageId: string) => void
+  togglePin: (conversationId: string, messageId: string) => void
+  addReaction: (
+    conversationId: string,
+    messageId: string,
+    emoji: string,
+  ) => void
 
   // Generation state
   setGenerationStatus: (
@@ -132,7 +142,52 @@ export const useChatStore = create<ChatState>()(
           }),
         }))
 
+        // Persist message to server
+        ;(async () => {
+          try {
+            await trpcClient.db.addMessage.mutate({
+              content: message.content,
+              conversationId,
+              role: message.role,
+            })
+          } catch {
+            // ignore
+          }
+        })()
+
         return id
+      },
+      addReaction: (conversationId, messageId, emoji) => {
+        set((state) => ({
+          conversations: state.conversations.map((c) =>
+            c.id === conversationId
+              ? {
+                  ...c,
+                  messages: c.messages.map((m) =>
+                    m.id === messageId
+                      ? {
+                          ...m,
+                          reactions: {
+                            ...(m.reactions ?? {}),
+                            [emoji]: (m.reactions?.[emoji] ?? 0) + 1,
+                          },
+                        }
+                      : m,
+                  ),
+                  updatedAt: Date.now(),
+                }
+              : c,
+          ),
+        }))
+        ;(async () => {
+          try {
+            await trpcClient.db.addReaction.mutate({
+              conversationId,
+              emoji,
+              messageId,
+            })
+          } catch {}
+        })()
       },
 
       appendToMessage: (conversationId, messageId, content) => {
@@ -168,6 +223,19 @@ export const useChatStore = create<ChatState>()(
           conversations: [conversation, ...state.conversations],
           selectedModel: model,
         }))
+
+        // Fire-and-forget: persist to server
+        ;(async () => {
+          try {
+            await trpcClient.db.createConversation.mutate({
+              model,
+              title: conversation.title,
+            })
+          } catch {
+            // ignore server errors — keep local state
+          }
+        })()
+
         return id
       },
 
@@ -285,6 +353,29 @@ export const useChatStore = create<ChatState>()(
 
       setSelectedModel: (model) => {
         set({ selectedModel: model })
+      },
+      togglePin: (conversationId, messageId) => {
+        set((state) => ({
+          conversations: state.conversations.map((c) =>
+            c.id === conversationId
+              ? {
+                  ...c,
+                  messages: c.messages.map((m) =>
+                    m.id === messageId ? { ...m, pinned: !m.pinned } : m,
+                  ),
+                  updatedAt: Date.now(),
+                }
+              : c,
+          ),
+        }))
+        ;(async () => {
+          try {
+            await trpcClient.db.togglePin.mutate({
+              conversationId,
+              messageId,
+            })
+          } catch {}
+        })()
       },
 
       updateConversationTitle: (id, title) => {

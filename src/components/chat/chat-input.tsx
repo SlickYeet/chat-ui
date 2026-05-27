@@ -37,10 +37,40 @@ export function ChatInput({
 
   const { selectedModel, setSelectedModel } = useChatStore()
 
-  const [{ models }, { isLoading }] = api.models.list.useSuspenseQuery()
+  const { data: modelsData, isLoading } = api.models.list.useQuery(undefined, {
+    enabled: isMounted,
+  })
+
+  const models = modelsData?.models ?? []
 
   React.useEffect(() => {
     setIsMounted(true)
+  }, [])
+
+  // Global shortcut to focus the input: '/' or Ctrl/Cmd+K
+  React.useEffect(() => {
+    const listener = (e: KeyboardEvent) => {
+      // Ignore if typing in any input or editable element
+      const active = document.activeElement
+      const tag = active?.tagName?.toLowerCase()
+      const isEditing =
+        tag === "input" ||
+        tag === "textarea" ||
+        (active as HTMLElement)?.isContentEditable
+
+      if (isEditing) return
+
+      if (
+        e.key === "/" ||
+        ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k")
+      ) {
+        e.preventDefault()
+        textareaRef.current?.focus()
+      }
+    }
+
+    window.addEventListener("keydown", listener)
+    return () => window.removeEventListener("keydown", listener)
   }, [])
 
   // Auto-select first model if none selected
@@ -69,7 +99,7 @@ export function ChatInput({
   }
 
   return (
-    <div className="border-t bg-card/50 p-4">
+    <div className="border-t bg-card/70 p-4">
       <div className="mx-auto max-w-3xl">
         <div className="mb-3 flex items-center gap-2">
           <span className="text-muted-foreground text-xs">Model:</span>
@@ -112,7 +142,7 @@ export function ChatInput({
         <div className="relative flex items-end gap-2">
           <div className="relative flex-1">
             <Textarea
-              className="max-h-50 min-h-12 resize-none bg-input/50 py-3 pr-12"
+              className="max-h-52 min-h-12 resize-none rounded-lg bg-input/60 py-3 pr-12 shadow-sm"
               disabled={disabled || !selectedModel || isGenerating}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
@@ -141,6 +171,7 @@ export function ChatInput({
               disabled={!input.trim() || !selectedModel || disabled}
               onClick={handleSubmit}
               size="icon"
+              variant="default"
             >
               <IconSend className="size-4" />
               <span className="sr-only">Send message</span>
@@ -149,7 +180,9 @@ export function ChatInput({
         </div>
 
         <p className="mt-4 text-center text-muted-foreground text-xs">
-          Press Enter to send, Shift+Enter for new line
+          Press Enter to send, Shift+Enter for new line,{" "}
+          <span className="font-mono">/</span> or{" "}
+          <span className="font-mono">Ctrl/Cmd+K</span> to focus
         </p>
       </div>
     </div>

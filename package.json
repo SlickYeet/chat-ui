@@ -21,6 +21,7 @@
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
     "react-textarea-autosize": "^8.5.9",
+    "redis": "^5.12.1",
     "server-only": "^0.0.1",
     "shadcn": "^4.8.0",
     "sonner": "^2.0.7",
@@ -55,7 +56,7 @@
     "lint:unsafe": "biome check --write --unsafe .",
     "lint:write": "biome check --write .",
     "shadcn": "bunx --bun shadcn@latest",
-    "start": "next start"
+    "start": "bun run db:migrate && next start"
   },
   "type": "module",
   "version": "0.1.0"
