@@ -19,7 +19,7 @@ Build a simple conversational UI with `Conversation` and [`PromptInput`](/compon
 Add the following component to your frontend:
 
 ```tsx title="app/page.tsx"
-"use client";
+"use client"
 
 import {
   Conversation,
@@ -27,35 +27,35 @@ import {
   ConversationDownload,
   ConversationEmptyState,
   ConversationScrollButton,
-} from "@/components/ai-elements/conversation";
+} from "@/components/ai-elements/conversation"
 import {
   Message,
   MessageContent,
   MessageResponse,
-} from "@/components/ai-elements/message";
+} from "@/components/ai-elements/message"
 import {
   PromptInput,
   type PromptInputMessage,
   PromptInputTextarea,
   PromptInputSubmit,
-} from "@/components/ai-elements/prompt-input";
-import { MessageSquare } from "lucide-react";
-import { useState } from "react";
-import { useChat } from "@ai-sdk/react";
+} from "@/components/ai-elements/prompt-input"
+import { MessageSquare } from "lucide-react"
+import { useState } from "react"
+import { useChat } from "@ai-sdk/react"
 
 const ConversationDemo = () => {
-  const [input, setInput] = useState("");
-  const { messages, sendMessage, status } = useChat();
+  const [input, setInput] = useState("")
+  const { messages, sendMessage, status } = useChat()
 
   const handleSubmit = (message: PromptInputMessage) => {
     if (message.text.trim()) {
-      sendMessage({ text: message.text });
-      setInput("");
+      sendMessage({ text: message.text })
+      setInput("")
     }
-  };
+  }
 
   return (
-    <div className="max-w-4xl mx-auto p-6 relative size-full rounded-lg border h-[600px]">
+    <div className="max-w-4xl mx-auto p-6 relative size-full rounded-lg border h-150">
       <div className="flex flex-col h-full">
         <Conversation>
           <ConversationContent>
@@ -76,9 +76,9 @@ const ConversationDemo = () => {
                             <MessageResponse key={`${message.id}-${i}`}>
                               {part.text}
                             </MessageResponse>
-                          );
+                          )
                         default:
-                          return null;
+                          return null
                       }
                     })}
                   </MessageContent>
@@ -108,29 +108,29 @@ const ConversationDemo = () => {
         </PromptInput>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ConversationDemo;
+export default ConversationDemo
 ```
 
 Add the following route to your backend:
 
 ```tsx title="api/chat/route.ts"
-import { streamText, UIMessage, convertToModelMessages } from "ai";
+import { streamText, UIMessage, convertToModelMessages } from "ai"
 
 // Allow streaming responses up to 30 seconds
-export const maxDuration = 30;
+export const maxDuration = 30
 
 export async function POST(req: Request) {
-  const { messages }: { messages: UIMessage[] } = await req.json();
+  const { messages }: { messages: UIMessage[] } = await req.json()
 
   const result = streamText({
     model: "openai/gpt-4o",
     messages: await convertToModelMessages(messages),
-  });
+  })
 
-  return result.toUIMessageStreamResponse();
+  return result.toUIMessageStreamResponse()
 }
 ```
 
@@ -150,35 +150,35 @@ export async function POST(req: Request) {
 
 ### `<Conversation />`
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `contextRef` | `React.Ref<StickToBottomContext>` | - | Optional ref to access the StickToBottom context object. |
-| `instance` | `StickToBottomInstance` | - | Optional instance for controlling the StickToBottom component. |
-| `children` | `((context: StickToBottomContext) => ReactNode) | ReactNode` | - | Render prop or ReactNode for custom rendering with context. |
-| `...props` | `Omit<React.HTMLAttributes<HTMLDivElement>, ` | - | Any other props are spread to the root div. |
+| Prop         | Type                                            | Default    | Description                                                    |
+| ------------ | ----------------------------------------------- | ---------- | -------------------------------------------------------------- | ----------------------------------------------------------- |
+| `contextRef` | `React.Ref<StickToBottomContext>`               | -          | Optional ref to access the StickToBottom context object.       |
+| `instance`   | `StickToBottomInstance`                         | -          | Optional instance for controlling the StickToBottom component. |
+| `children`   | `((context: StickToBottomContext) => ReactNode) | ReactNode` | -                                                              | Render prop or ReactNode for custom rendering with context. |
+| `...props`   | `Omit<React.HTMLAttributes<HTMLDivElement>, `   | -          | Any other props are spread to the root div.                    |
 
 ### `<ConversationContent />`
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `children` | `((context: StickToBottomContext) => ReactNode) | ReactNode` | - | Render prop or ReactNode for custom rendering with context. |
-| `...props` | `Omit<React.HTMLAttributes<HTMLDivElement>, ` | - | Any other props are spread to the root div. |
+| Prop       | Type                                            | Default    | Description                                 |
+| ---------- | ----------------------------------------------- | ---------- | ------------------------------------------- | ----------------------------------------------------------- |
+| `children` | `((context: StickToBottomContext) => ReactNode) | ReactNode` | -                                           | Render prop or ReactNode for custom rendering with context. |
+| `...props` | `Omit<React.HTMLAttributes<HTMLDivElement>, `   | -          | Any other props are spread to the root div. |
 
 ### `<ConversationEmptyState />`
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `title` | `string` | - | The title text to display. |
-| `description` | `string` | - | The description text to display. |
-| `icon` | `React.ReactNode` | - | Optional icon to display above the text. |
-| `children` | `React.ReactNode` | - | Optional additional content to render below the text. |
-| `...props` | `ComponentProps<` | - | Any other props are spread to the root div. |
+| Prop          | Type              | Default | Description                                           |
+| ------------- | ----------------- | ------- | ----------------------------------------------------- |
+| `title`       | `string`          | -       | The title text to display.                            |
+| `description` | `string`          | -       | The description text to display.                      |
+| `icon`        | `React.ReactNode` | -       | Optional icon to display above the text.              |
+| `children`    | `React.ReactNode` | -       | Optional additional content to render below the text. |
+| `...props`    | `ComponentProps<` | -       | Any other props are spread to the root div.           |
 
 ### `<ConversationScrollButton />`
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `...props` | `ComponentProps<typeof Button>` | - | Any other props are spread to the underlying shadcn/ui Button component. |
+| Prop       | Type                            | Default | Description                                                              |
+| ---------- | ------------------------------- | ------- | ------------------------------------------------------------------------ |
+| `...props` | `ComponentProps<typeof Button>` | -       | Any other props are spread to the underlying shadcn/ui Button component. |
 
 ### `<ConversationDownload />`
 
@@ -196,21 +196,21 @@ import { ConversationDownload } from "@/components/ai-elements/conversation";
 </Conversation>
 ```
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `messages` | `UIMessage[]` | Required | Array of messages to include in the download. |
-| `filename` | `string` | - | The filename for the downloaded file. |
-| `formatMessage` | `(message: UIMessage, index: number) => string` | - | Custom function to format each message in the output. |
-| `...props` | `Omit<ComponentProps<typeof Button>, ` | - | Any other props are spread to the underlying shadcn/ui Button component. |
+| Prop            | Type                                            | Default  | Description                                                              |
+| --------------- | ----------------------------------------------- | -------- | ------------------------------------------------------------------------ |
+| `messages`      | `UIMessage[]`                                   | Required | Array of messages to include in the download.                            |
+| `filename`      | `string`                                        | -        | The filename for the downloaded file.                                    |
+| `formatMessage` | `(message: UIMessage, index: number) => string` | -        | Custom function to format each message in the output.                    |
+| `...props`      | `Omit<ComponentProps<typeof Button>, `          | -        | Any other props are spread to the underlying shadcn/ui Button component. |
 
 ### `messagesToMarkdown`
 
 A utility function to convert messages to Markdown format. Useful for custom download implementations.
 
 ```tsx
-import { messagesToMarkdown } from "@/components/ai-elements/conversation";
+import { messagesToMarkdown } from "@/components/ai-elements/conversation"
 
-const markdown = messagesToMarkdown(messages);
+const markdown = messagesToMarkdown(messages)
 
 // With custom formatter
 const customMarkdown = messagesToMarkdown(
@@ -219,6 +219,6 @@ const customMarkdown = messagesToMarkdown(
     `[${msg.role}]: ${msg.parts
       .filter((p) => p.type === "text")
       .map((p) => p.text)
-      .join("")}`
-);
+      .join("")}`,
+)
 ```

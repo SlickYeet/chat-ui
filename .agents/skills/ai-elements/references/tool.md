@@ -19,59 +19,59 @@ Build a simple stateful weather app that renders the last message in a tool usin
 Add the following component to your frontend:
 
 ```tsx title="app/page.tsx"
-"use client";
+"use client"
 
-import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport, type ToolUIPart } from "ai";
-import { Button } from "@/components/ui/button";
-import { MessageResponse } from "@/components/ai-elements/message";
+import { useChat } from "@ai-sdk/react"
+import { DefaultChatTransport, type ToolUIPart } from "ai"
+import { Button } from "@/components/ui/button"
+import { MessageResponse } from "@/components/ai-elements/message"
 import {
   Tool,
   ToolContent,
   ToolHeader,
   ToolInput,
   ToolOutput,
-} from "@/components/ai-elements/tool";
+} from "@/components/ai-elements/tool"
 
 type WeatherToolInput = {
-  location: string;
-  units: "celsius" | "fahrenheit";
-};
+  location: string
+  units: "celsius" | "fahrenheit"
+}
 
 type WeatherToolOutput = {
-  location: string;
-  temperature: string;
-  conditions: string;
-  humidity: string;
-  windSpeed: string;
-  lastUpdated: string;
-};
+  location: string
+  temperature: string
+  conditions: string
+  humidity: string
+  windSpeed: string
+  lastUpdated: string
+}
 
 type WeatherToolUIPart = ToolUIPart<{
   fetch_weather_data: {
-    input: WeatherToolInput;
-    output: WeatherToolOutput;
-  };
-}>;
+    input: WeatherToolInput
+    output: WeatherToolOutput
+  }
+}>
 
 const Example = () => {
   const { messages, sendMessage, status } = useChat({
     transport: new DefaultChatTransport({
       api: "/api/weather",
     }),
-  });
+  })
 
   const handleWeatherClick = () => {
-    sendMessage({ text: "Get weather data for San Francisco in fahrenheit" });
-  };
+    sendMessage({ text: "Get weather data for San Francisco in fahrenheit" })
+  }
 
-  const latestMessage = messages[messages.length - 1];
+  const latestMessage = messages[messages.length - 1]
   const weatherTool = latestMessage?.parts?.find(
-    (part) => part.type === "tool-fetch_weather_data"
-  ) as WeatherToolUIPart | undefined;
+    (part) => part.type === "tool-fetch_weather_data",
+  ) as WeatherToolUIPart | undefined
 
   return (
-    <div className="max-w-4xl mx-auto p-6 relative size-full rounded-lg border h-[600px]">
+    <div className="max-w-4xl mx-auto p-6 relative size-full rounded-lg border h-150">
       <div className="flex flex-col h-full">
         <div className="space-y-4">
           <Button onClick={handleWeatherClick} disabled={status !== "ready"}>
@@ -100,8 +100,8 @@ const Example = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
 function formatWeatherResult(result: WeatherToolOutput): string {
   return `**Weather for ${result.location}**
@@ -111,23 +111,23 @@ function formatWeatherResult(result: WeatherToolOutput): string {
 **Humidity:** ${result.humidity}  
 **Wind Speed:** ${result.windSpeed}  
 
-*Last updated: ${result.lastUpdated}*`;
+*Last updated: ${result.lastUpdated}*`
 }
 
-export default Example;
+export default Example
 ```
 
 Add the following route to your backend:
 
 ```ts title="app/api/weather/route.tsx"
-import { streamText, UIMessage, convertToModelMessages } from "ai";
-import { z } from "zod";
+import { streamText, UIMessage, convertToModelMessages } from "ai"
+import { z } from "zod"
 
 // Allow streaming responses up to 30 seconds
-export const maxDuration = 30;
+export const maxDuration = 30
 
 export async function POST(req: Request) {
-  const { messages }: { messages: UIMessage[] } = await req.json();
+  const { messages }: { messages: UIMessage[] } = await req.json()
 
   const result = streamText({
     model: "openai/gpt-4o",
@@ -149,12 +149,12 @@ export async function POST(req: Request) {
           units: z.enum(["celsius", "fahrenheit"]).default("celsius"),
         }),
         execute: async ({ location, units }) => {
-          await new Promise((resolve) => setTimeout(resolve, 1500));
+          await new Promise((resolve) => setTimeout(resolve, 1500))
 
           const temp =
             units === "celsius"
               ? Math.floor(Math.random() * 35) + 5
-              : Math.floor(Math.random() * 63) + 41;
+              : Math.floor(Math.random() * 63) + 41
 
           return {
             location,
@@ -163,13 +163,13 @@ export async function POST(req: Request) {
             humidity: `12%`,
             windSpeed: `35 ${units === "celsius" ? "km/h" : "mph"}`,
             lastUpdated: new Date().toLocaleString(),
-          };
+          }
         },
       },
     },
-  });
+  })
 
-  return result.toUIMessageStreamResponse();
+  return result.toUIMessageStreamResponse()
 }
 ```
 
@@ -215,41 +215,41 @@ See `scripts/tool-output-error.tsx` for this example.
 
 ### `<Tool />`
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `...props` | `React.ComponentProps<typeof Collapsible>` | - | Any other props are spread to the root Collapsible component. |
+| Prop       | Type                                       | Default | Description                                                   |
+| ---------- | ------------------------------------------ | ------- | ------------------------------------------------------------- |
+| `...props` | `React.ComponentProps<typeof Collapsible>` | -       | Any other props are spread to the root Collapsible component. |
 
 ### `<ToolHeader />`
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `title` | `string` | - | Custom title to display instead of the derived tool name. |
-| `type` | `ToolUIPart[` | Required | The type/name of the tool. |
-| `state` | `ToolUIPart[` | Required | The current state of the tool (input-streaming, input-available, output-available, or output-error). |
-| `toolName` | `string` | - | Required when type is  |
-| `className` | `string` | - | Additional CSS classes to apply to the header. |
-| `...props` | `React.ComponentProps<typeof CollapsibleTrigger>` | - | Any other props are spread to the CollapsibleTrigger. |
+| Prop        | Type                                              | Default  | Description                                                                                          |
+| ----------- | ------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------- |
+| `title`     | `string`                                          | -        | Custom title to display instead of the derived tool name.                                            |
+| `type`      | `ToolUIPart[`                                     | Required | The type/name of the tool.                                                                           |
+| `state`     | `ToolUIPart[`                                     | Required | The current state of the tool (input-streaming, input-available, output-available, or output-error). |
+| `toolName`  | `string`                                          | -        | Required when type is                                                                                |
+| `className` | `string`                                          | -        | Additional CSS classes to apply to the header.                                                       |
+| `...props`  | `React.ComponentProps<typeof CollapsibleTrigger>` | -        | Any other props are spread to the CollapsibleTrigger.                                                |
 
 ### `<ToolContent />`
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `...props` | `React.ComponentProps<typeof CollapsibleContent>` | - | Any other props are spread to the CollapsibleContent. |
+| Prop       | Type                                              | Default | Description                                           |
+| ---------- | ------------------------------------------------- | ------- | ----------------------------------------------------- |
+| `...props` | `React.ComponentProps<typeof CollapsibleContent>` | -       | Any other props are spread to the CollapsibleContent. |
 
 ### `<ToolInput />`
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `input` | `ToolUIPart[` | - | The input parameters passed to the tool, displayed as formatted JSON. |
-| `...props` | `React.ComponentProps<` | - | Any other props are spread to the underlying div. |
+| Prop       | Type                    | Default | Description                                                           |
+| ---------- | ----------------------- | ------- | --------------------------------------------------------------------- |
+| `input`    | `ToolUIPart[`           | -       | The input parameters passed to the tool, displayed as formatted JSON. |
+| `...props` | `React.ComponentProps<` | -       | Any other props are spread to the underlying div.                     |
 
 ### `<ToolOutput />`
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `output` | `React.ReactNode` | - | The output/result of the tool execution. |
-| `errorText` | `ToolUIPart[` | - | An error message if the tool execution failed. |
-| `...props` | `React.ComponentProps<` | - | Any other props are spread to the underlying div. |
+| Prop        | Type                    | Default | Description                                       |
+| ----------- | ----------------------- | ------- | ------------------------------------------------- |
+| `output`    | `React.ReactNode`       | -       | The output/result of the tool execution.          |
+| `errorText` | `ToolUIPart[`           | -       | An error message if the tool execution failed.    |
+| `...props`  | `React.ComponentProps<` | -       | Any other props are spread to the underlying div. |
 
 ## Type Exports
 
@@ -258,7 +258,7 @@ See `scripts/tool-output-error.tsx` for this example.
 Union type representing both static and dynamic tool UI parts.
 
 ```tsx
-type ToolPart = ToolUIPart | DynamicToolUIPart;
+type ToolPart = ToolUIPart | DynamicToolUIPart
 ```
 
 ## Utilities
@@ -268,10 +268,10 @@ type ToolPart = ToolUIPart | DynamicToolUIPart;
 Returns a Badge component with icon and label based on tool state.
 
 ```tsx
-import { getStatusBadge } from "@/components/ai-elements/tool";
+import { getStatusBadge } from "@/components/ai-elements/tool"
 
 // Returns a Badge with appropriate icon and label
-const badge = getStatusBadge("output-available");
+const badge = getStatusBadge("output-available")
 ```
 
 Supported states:

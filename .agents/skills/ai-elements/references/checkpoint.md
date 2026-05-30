@@ -77,7 +77,7 @@ const CheckpointDemo = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6 relative size-full rounded-lg border h-[600px]">
+    <div className="max-w-4xl mx-auto p-6 relative size-full rounded-lg border h-150">
       <Conversation>
         <ConversationContent>
           {messages.map((message, index) => {

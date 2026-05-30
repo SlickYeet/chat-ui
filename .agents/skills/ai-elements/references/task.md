@@ -19,18 +19,18 @@ Build a mock async programming agent using [`experimental_generateObject`](/docs
 Add the following component to your frontend:
 
 ```tsx title="app/page.tsx"
-"use client";
+"use client"
 
-import { experimental_useObject as useObject } from "@ai-sdk/react";
+import { experimental_useObject as useObject } from "@ai-sdk/react"
 import {
   Task,
   TaskItem,
   TaskItemFile,
   TaskTrigger,
   TaskContent,
-} from "@/components/ai-elements/task";
-import { Button } from "@/components/ui/button";
-import { tasksSchema } from "@/app/api/task/route";
+} from "@/components/ai-elements/task"
+import { Button } from "@/components/ui/button"
+import { tasksSchema } from "@/app/api/task/route"
 import {
   SiReact,
   SiTypescript,
@@ -39,7 +39,7 @@ import {
   SiHtml5,
   SiJson,
   SiMarkdown,
-} from "@icons-pack/react-simple-icons";
+} from "@icons-pack/react-simple-icons"
 
 const iconMap = {
   react: { component: SiReact, color: "#149ECA" },
@@ -49,23 +49,23 @@ const iconMap = {
   html: { component: SiHtml5, color: "#E34F26" },
   json: { component: SiJson, color: "#000000" },
   markdown: { component: SiMarkdown, color: "#000000" },
-};
+}
 
 const TaskDemo = () => {
   const { object, submit, isLoading } = useObject({
     api: "/api/agent",
     schema: tasksSchema,
-  });
+  })
 
   const handleSubmit = (taskType: string) => {
-    submit({ prompt: taskType });
-  };
+    submit({ prompt: taskType })
+  }
 
   const renderTaskItem = (item: any, index: number) => {
     if (item?.type === "file" && item.file) {
-      const iconInfo = iconMap[item.file.icon as keyof typeof iconMap];
+      const iconInfo = iconMap[item.file.icon as keyof typeof iconMap]
       if (iconInfo) {
-        const IconComponent = iconInfo.component;
+        const IconComponent = iconInfo.component
         return (
           <span className="inline-flex items-center gap-1" key={index}>
             {item.text}
@@ -77,14 +77,14 @@ const TaskDemo = () => {
               <span>{item.file.name}</span>
             </TaskItemFile>
           </span>
-        );
+        )
       }
     }
-    return item?.text || "";
-  };
+    return item?.text || ""
+  }
 
   return (
-    <div className="max-w-4xl mx-auto p-6 relative size-full rounded-lg border h-[600px]">
+    <div className="max-w-4xl mx-auto p-6 relative size-full rounded-lg border h-150">
       <div className="flex flex-col h-full">
         <div className="flex gap-2 mb-6 flex-wrap">
           <Button
@@ -116,17 +116,17 @@ const TaskDemo = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default TaskDemo;
+export default TaskDemo
 ```
 
 Add the following route to your backend:
 
 ```ts title="app/api/agent.ts"
-import { streamObject } from "ai";
-import { z } from "zod";
+import { streamObject } from "ai"
+import { z } from "zod"
 
 export const taskItemSchema = z.object({
   type: z.enum(["text", "file"]),
@@ -138,23 +138,23 @@ export const taskItemSchema = z.object({
       color: z.string().optional(),
     })
     .optional(),
-});
+})
 
 export const taskSchema = z.object({
   title: z.string(),
   items: z.array(taskItemSchema),
   status: z.enum(["pending", "in_progress", "completed"]),
-});
+})
 
 export const tasksSchema = z.object({
   tasks: z.array(taskSchema),
-});
+})
 
 // Allow streaming responses up to 30 seconds
-export const maxDuration = 30;
+export const maxDuration = 30
 
 export async function POST(req: Request) {
-  const { prompt } = await req.json();
+  const { prompt } = await req.json()
 
   const result = streamObject({
     model: "openai/gpt-4o",
@@ -171,9 +171,9 @@ export async function POST(req: Request) {
     For file items, use these icon types: 'react', 'typescript', 'javascript', 'css', 'html', 'json', 'markdown'
 
     Generate 3-4 tasks total, with 4-6 items each.`,
-  });
+  })
 
-  return result.toTextStreamResponse();
+  return result.toTextStreamResponse()
 }
 ```
 
@@ -191,32 +191,32 @@ export async function POST(req: Request) {
 
 ### `<Task />`
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `defaultOpen` | `boolean` | `true` | Whether the task is open by default. |
-| `...props` | `React.ComponentProps<typeof Collapsible>` | - | Any other props are spread to the root Collapsible component. |
+| Prop          | Type                                       | Default | Description                                                   |
+| ------------- | ------------------------------------------ | ------- | ------------------------------------------------------------- |
+| `defaultOpen` | `boolean`                                  | `true`  | Whether the task is open by default.                          |
+| `...props`    | `React.ComponentProps<typeof Collapsible>` | -       | Any other props are spread to the root Collapsible component. |
 
 ### `<TaskTrigger />`
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `title` | `string` | Required | The title of the task that will be displayed in the trigger. |
-| `...props` | `React.ComponentProps<typeof CollapsibleTrigger>` | - | Any other props are spread to the CollapsibleTrigger component. |
+| Prop       | Type                                              | Default  | Description                                                     |
+| ---------- | ------------------------------------------------- | -------- | --------------------------------------------------------------- |
+| `title`    | `string`                                          | Required | The title of the task that will be displayed in the trigger.    |
+| `...props` | `React.ComponentProps<typeof CollapsibleTrigger>` | -        | Any other props are spread to the CollapsibleTrigger component. |
 
 ### `<TaskContent />`
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `...props` | `React.ComponentProps<typeof CollapsibleContent>` | - | Any other props are spread to the CollapsibleContent component. |
+| Prop       | Type                                              | Default | Description                                                     |
+| ---------- | ------------------------------------------------- | ------- | --------------------------------------------------------------- |
+| `...props` | `React.ComponentProps<typeof CollapsibleContent>` | -       | Any other props are spread to the CollapsibleContent component. |
 
 ### `<TaskItem />`
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `...props` | `React.ComponentProps<` | - | Any other props are spread to the underlying div. |
+| Prop       | Type                    | Default | Description                                       |
+| ---------- | ----------------------- | ------- | ------------------------------------------------- |
+| `...props` | `React.ComponentProps<` | -       | Any other props are spread to the underlying div. |
 
 ### `<TaskItemFile />`
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `...props` | `React.ComponentProps<` | - | Any other props are spread to the underlying div. |
+| Prop       | Type                    | Default | Description                                       |
+| ---------- | ----------------------- | ------- | ------------------------------------------------- |
+| `...props` | `React.ComponentProps<` | -       | Any other props are spread to the underlying div. |
