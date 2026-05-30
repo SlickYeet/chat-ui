@@ -1,657 +1,637 @@
 {
-  "id": "7dd7c931-a6fa-42ab-bfff-085ca2ff7d3d",
-  "prevId": "00000000-0000-0000-0000-000000000000",
-  "version": "7",
-  "dialect": "postgresql",
-  "tables": {
-    "public.chat-ui_account": {
-      "name": "chat-ui_account",
-      "schema": "",
-      "columns": {
-        "accessToken": {
-          "name": "accessToken",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "accessTokenExpiresAt": {
-          "name": "accessTokenExpiresAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "accountId": {
-          "name": "accountId",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "CURRENT_TIMESTAMP"
-        },
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "idToken": {
-          "name": "idToken",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "password": {
-          "name": "password",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "providerId": {
-          "name": "providerId",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "refreshToken": {
-          "name": "refreshToken",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "refreshTokenExpiresAt": {
-          "name": "refreshTokenExpiresAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "scope": {
-          "name": "scope",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "updatedAt": {
-          "name": "updatedAt",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "userId": {
-          "name": "userId",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {
-        "account_userId_idx": {
-          "name": "account_userId_idx",
-          "columns": [
-            {
-              "expression": "userId",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "chat-ui_account_userId_chat-ui_user_id_fk": {
-          "name": "chat-ui_account_userId_chat-ui_user_id_fk",
-          "tableFrom": "chat-ui_account",
-          "tableTo": "chat-ui_user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.chat-ui_conversation": {
-      "name": "chat-ui_conversation",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "title": {
-          "name": "title",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "model": {
-          "name": "model",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "CURRENT_TIMESTAMP"
-        },
-        "updatedAt": {
-          "name": "updatedAt",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "userId": {
-          "name": "userId",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "chat-ui_conversation_userId_chat-ui_user_id_fk": {
-          "name": "chat-ui_conversation_userId_chat-ui_user_id_fk",
-          "tableFrom": "chat-ui_conversation",
-          "tableTo": "chat-ui_user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.chat-ui_message": {
-      "name": "chat-ui_message",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "conversationId": {
-          "name": "conversationId",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "role": {
-          "name": "role",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "content": {
-          "name": "content",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "CURRENT_TIMESTAMP"
-        },
-        "updatedAt": {
-          "name": "updatedAt",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "pinned": {
-          "name": "pinned",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "reactions": {
-          "name": "reactions",
-          "type": "json",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "error": {
-          "name": "error",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "chat-ui_message_conversationId_chat-ui_conversation_id_fk": {
-          "name": "chat-ui_message_conversationId_chat-ui_conversation_id_fk",
-          "tableFrom": "chat-ui_message",
-          "tableTo": "chat-ui_conversation",
-          "columnsFrom": [
-            "conversationId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.chat-ui_model": {
-      "name": "chat-ui_model",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "CURRENT_TIMESTAMP"
-        },
-        "updatedAt": {
-          "name": "updatedAt",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.chat-ui_post": {
-      "name": "chat-ui_post",
-      "schema": "",
-      "columns": {
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "CURRENT_TIMESTAMP"
-        },
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": true,
-          "notNull": true,
-          "identity": {
-            "type": "byDefault",
-            "name": "chat-ui_post_id_seq",
-            "schema": "public",
-            "increment": "1",
-            "startWith": "1",
-            "minValue": "1",
-            "maxValue": "2147483647",
-            "cache": "1",
-            "cycle": false
-          }
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "updatedAt": {
-          "name": "updatedAt",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {
-        "post_name_idx": {
-          "name": "post_name_idx",
-          "columns": [
-            {
-              "expression": "name",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.chat-ui_session": {
-      "name": "chat-ui_session",
-      "schema": "",
-      "columns": {
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "CURRENT_TIMESTAMP"
-        },
-        "expiresAt": {
-          "name": "expiresAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "ipAddress": {
-          "name": "ipAddress",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "token": {
-          "name": "token",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "updatedAt": {
-          "name": "updatedAt",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "userAgent": {
-          "name": "userAgent",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "userId": {
-          "name": "userId",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {
-        "session_userId_idx": {
-          "name": "session_userId_idx",
-          "columns": [
-            {
-              "expression": "userId",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "chat-ui_session_userId_chat-ui_user_id_fk": {
-          "name": "chat-ui_session_userId_chat-ui_user_id_fk",
-          "tableFrom": "chat-ui_session",
-          "tableTo": "chat-ui_user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "chat-ui_session_token_unique": {
-          "name": "chat-ui_session_token_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "token"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.chat-ui_user": {
-      "name": "chat-ui_user",
-      "schema": "",
-      "columns": {
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "CURRENT_TIMESTAMP"
-        },
-        "email": {
-          "name": "email",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "emailVerified": {
-          "name": "emailVerified",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "image": {
-          "name": "image",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "updatedAt": {
-          "name": "updatedAt",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {
-        "user_name_idx": {
-          "name": "user_name_idx",
-          "columns": [
-            {
-              "expression": "name",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "user_email_idx": {
-          "name": "user_email_idx",
-          "columns": [
-            {
-              "expression": "email",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "chat-ui_user_email_unique": {
-          "name": "chat-ui_user_email_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.chat-ui_verification": {
-      "name": "chat-ui_verification",
-      "schema": "",
-      "columns": {
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "CURRENT_TIMESTAMP"
-        },
-        "expiresAt": {
-          "name": "expiresAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "identifier": {
-          "name": "identifier",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "updatedAt": {
-          "name": "updatedAt",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "value": {
-          "name": "value",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {
-        "verification_identifier_idx": {
-          "name": "verification_identifier_idx",
-          "columns": [
-            {
-              "expression": "identifier",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    }
-  },
-  "enums": {},
-  "schemas": {},
-  "sequences": {},
-  "roles": {},
-  "policies": {},
-  "views": {},
   "_meta": {
     "columns": {},
     "schemas": {},
     "tables": {}
-  }
+  },
+  "dialect": "postgresql",
+  "enums": {},
+  "id": "7dd7c931-a6fa-42ab-bfff-085ca2ff7d3d",
+  "policies": {},
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "roles": {},
+  "schemas": {},
+  "sequences": {},
+  "tables": {
+    "public.chat-ui_account": {
+      "checkConstraints": {},
+      "columns": {
+        "accessToken": {
+          "name": "accessToken",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "accessTokenExpiresAt": {
+          "name": "accessTokenExpiresAt",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "accountId": {
+          "name": "accountId",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "createdAt": {
+          "default": "CURRENT_TIMESTAMP",
+          "name": "createdAt",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "id": {
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "text"
+        },
+        "idToken": {
+          "name": "idToken",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "password": {
+          "name": "password",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "providerId": {
+          "name": "providerId",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "refreshToken": {
+          "name": "refreshToken",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "refreshTokenExpiresAt": {
+          "name": "refreshTokenExpiresAt",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "scope": {
+          "name": "scope",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "userId": {
+          "name": "userId",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "chat-ui_account_userId_chat-ui_user_id_fk": {
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
+          "name": "chat-ui_account_userId_chat-ui_user_id_fk",
+          "onDelete": "cascade",
+          "onUpdate": "no action",
+          "tableFrom": "chat-ui_account",
+          "tableTo": "chat-ui_user"
+        }
+      },
+      "indexes": {
+        "account_userId_idx": {
+          "columns": [
+            {
+              "asc": true,
+              "expression": "userId",
+              "isExpression": false,
+              "nulls": "last"
+            }
+          ],
+          "concurrently": false,
+          "isUnique": false,
+          "method": "btree",
+          "name": "account_userId_idx",
+          "with": {}
+        }
+      },
+      "isRLSEnabled": false,
+      "name": "chat-ui_account",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    },
+    "public.chat-ui_conversation": {
+      "checkConstraints": {},
+      "columns": {
+        "createdAt": {
+          "default": "CURRENT_TIMESTAMP",
+          "name": "createdAt",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "id": {
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "text"
+        },
+        "model": {
+          "name": "model",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "title": {
+          "name": "title",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "varchar(255)"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "userId": {
+          "name": "userId",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "chat-ui_conversation_userId_chat-ui_user_id_fk": {
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
+          "name": "chat-ui_conversation_userId_chat-ui_user_id_fk",
+          "onDelete": "cascade",
+          "onUpdate": "no action",
+          "tableFrom": "chat-ui_conversation",
+          "tableTo": "chat-ui_user"
+        }
+      },
+      "indexes": {},
+      "isRLSEnabled": false,
+      "name": "chat-ui_conversation",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    },
+    "public.chat-ui_message": {
+      "checkConstraints": {},
+      "columns": {
+        "content": {
+          "name": "content",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "conversationId": {
+          "name": "conversationId",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "createdAt": {
+          "default": "CURRENT_TIMESTAMP",
+          "name": "createdAt",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "error": {
+          "name": "error",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "id": {
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "text"
+        },
+        "pinned": {
+          "name": "pinned",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "boolean"
+        },
+        "reactions": {
+          "name": "reactions",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "json"
+        },
+        "role": {
+          "name": "role",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "chat-ui_message_conversationId_chat-ui_conversation_id_fk": {
+          "columnsFrom": ["conversationId"],
+          "columnsTo": ["id"],
+          "name": "chat-ui_message_conversationId_chat-ui_conversation_id_fk",
+          "onDelete": "cascade",
+          "onUpdate": "no action",
+          "tableFrom": "chat-ui_message",
+          "tableTo": "chat-ui_conversation"
+        }
+      },
+      "indexes": {},
+      "isRLSEnabled": false,
+      "name": "chat-ui_message",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    },
+    "public.chat-ui_model": {
+      "checkConstraints": {},
+      "columns": {
+        "createdAt": {
+          "default": "CURRENT_TIMESTAMP",
+          "name": "createdAt",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "description": {
+          "name": "description",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "id": {
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "text"
+        },
+        "name": {
+          "name": "name",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {},
+      "indexes": {},
+      "isRLSEnabled": false,
+      "name": "chat-ui_model",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    },
+    "public.chat-ui_post": {
+      "checkConstraints": {},
+      "columns": {
+        "createdAt": {
+          "default": "CURRENT_TIMESTAMP",
+          "name": "createdAt",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "id": {
+          "identity": {
+            "cache": "1",
+            "cycle": false,
+            "increment": "1",
+            "maxValue": "2147483647",
+            "minValue": "1",
+            "name": "chat-ui_post_id_seq",
+            "schema": "public",
+            "startWith": "1",
+            "type": "byDefault"
+          },
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "integer"
+        },
+        "name": {
+          "name": "name",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "varchar(255)"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {},
+      "indexes": {
+        "post_name_idx": {
+          "columns": [
+            {
+              "asc": true,
+              "expression": "name",
+              "isExpression": false,
+              "nulls": "last"
+            }
+          ],
+          "concurrently": false,
+          "isUnique": false,
+          "method": "btree",
+          "name": "post_name_idx",
+          "with": {}
+        }
+      },
+      "isRLSEnabled": false,
+      "name": "chat-ui_post",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    },
+    "public.chat-ui_session": {
+      "checkConstraints": {},
+      "columns": {
+        "createdAt": {
+          "default": "CURRENT_TIMESTAMP",
+          "name": "createdAt",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "expiresAt": {
+          "name": "expiresAt",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "id": {
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "text"
+        },
+        "ipAddress": {
+          "name": "ipAddress",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "token": {
+          "name": "token",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "userAgent": {
+          "name": "userAgent",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "userId": {
+          "name": "userId",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "chat-ui_session_userId_chat-ui_user_id_fk": {
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
+          "name": "chat-ui_session_userId_chat-ui_user_id_fk",
+          "onDelete": "cascade",
+          "onUpdate": "no action",
+          "tableFrom": "chat-ui_session",
+          "tableTo": "chat-ui_user"
+        }
+      },
+      "indexes": {
+        "session_userId_idx": {
+          "columns": [
+            {
+              "asc": true,
+              "expression": "userId",
+              "isExpression": false,
+              "nulls": "last"
+            }
+          ],
+          "concurrently": false,
+          "isUnique": false,
+          "method": "btree",
+          "name": "session_userId_idx",
+          "with": {}
+        }
+      },
+      "isRLSEnabled": false,
+      "name": "chat-ui_session",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {
+        "chat-ui_session_token_unique": {
+          "columns": ["token"],
+          "name": "chat-ui_session_token_unique",
+          "nullsNotDistinct": false
+        }
+      }
+    },
+    "public.chat-ui_user": {
+      "checkConstraints": {},
+      "columns": {
+        "createdAt": {
+          "default": "CURRENT_TIMESTAMP",
+          "name": "createdAt",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "email": {
+          "name": "email",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "emailVerified": {
+          "name": "emailVerified",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "boolean"
+        },
+        "id": {
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "text"
+        },
+        "image": {
+          "name": "image",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "name": {
+          "name": "name",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {},
+      "indexes": {
+        "user_email_idx": {
+          "columns": [
+            {
+              "asc": true,
+              "expression": "email",
+              "isExpression": false,
+              "nulls": "last"
+            }
+          ],
+          "concurrently": false,
+          "isUnique": false,
+          "method": "btree",
+          "name": "user_email_idx",
+          "with": {}
+        },
+        "user_name_idx": {
+          "columns": [
+            {
+              "asc": true,
+              "expression": "name",
+              "isExpression": false,
+              "nulls": "last"
+            }
+          ],
+          "concurrently": false,
+          "isUnique": false,
+          "method": "btree",
+          "name": "user_name_idx",
+          "with": {}
+        }
+      },
+      "isRLSEnabled": false,
+      "name": "chat-ui_user",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {
+        "chat-ui_user_email_unique": {
+          "columns": ["email"],
+          "name": "chat-ui_user_email_unique",
+          "nullsNotDistinct": false
+        }
+      }
+    },
+    "public.chat-ui_verification": {
+      "checkConstraints": {},
+      "columns": {
+        "createdAt": {
+          "default": "CURRENT_TIMESTAMP",
+          "name": "createdAt",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "expiresAt": {
+          "name": "expiresAt",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp"
+        },
+        "id": {
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "text"
+        },
+        "identifier": {
+          "name": "identifier",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "value": {
+          "name": "value",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {},
+      "indexes": {
+        "verification_identifier_idx": {
+          "columns": [
+            {
+              "asc": true,
+              "expression": "identifier",
+              "isExpression": false,
+              "nulls": "last"
+            }
+          ],
+          "concurrently": false,
+          "isUnique": false,
+          "method": "btree",
+          "name": "verification_identifier_idx",
+          "with": {}
+        }
+      },
+      "isRLSEnabled": false,
+      "name": "chat-ui_verification",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    }
+  },
+  "version": "7",
+  "views": {}
 }
